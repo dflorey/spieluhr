@@ -37,7 +37,7 @@ public class Spieluhr {
 	public static void main(String[] args) {
 		try {
 			Sequence sequence = MidiSystem.getSequence(new File(
-					"C:/tmp/test.mid"));
+					"C:/tmp/Spieluhr2.mid"));
 			long tickLength = sequence.getTickLength();
 
 			int totalWidth = (int) (tickLength * TEMPO);
@@ -101,7 +101,7 @@ public class Spieluhr {
 					}
 				}
 			}
-			File outputfile = new File("C:/tmp/image.png");
+			File outputfile = new File("C:/tmp/Spieluhr2.png");
 			ImageIO.write(image, "png", outputfile);
 		} catch (InvalidMidiDataException e) {
 			e.printStackTrace();
