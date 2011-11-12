@@ -21,64 +21,89 @@ import javax.sound.midi.ShortMessage;
 import javax.sound.midi.Track;
 
 public class Spieluhr {
+	private final static String NAME = "Spieluhr3";
 	private final static String[] notes = new String[] { "C", "D", "E", "F",
 			"G", "A", "B" };
-	private static final float TEMPO = 0.8F; // TEMPO
+	private static final float TEMPO = 0.9F; // TEMPO
 
 	private static final int PADDING_TOP = 250, PADDING_LEFT = 500,
 			PADDING_RIGHT = 500, TEXT_PADDING_TOP = 285;
 
 	private static final int STAVE_HEIGHT = 2500, STAVE_WIDTH = 8000,
-			KEY_DISTANCE = 105, HOLE_WIDTH = 50, HOLE_HEIGHT = 50;
+			KEY_DISTANCE = 105, HOLE_WIDTH = 50, HOLE_HEIGHT = 50,
+			STAVES_PER_PAGE = 3;
 
 	private static final int[] keyMap = new int[] { 81, 79, 77, 76, 74, 72, 71,
 			69, 67, 65, 64, 62, 60, 59, 57, 55, 53, 52, 50, 48 };
 
 	public static void main(String[] args) {
 		try {
-			Sequence sequence = MidiSystem.getSequence(new File(
-					"C:/tmp/Spieluhr2.mid"));
+			Sequence sequence = MidiSystem.getSequence(new File("C:/tmp/"
+					+ NAME + ".mid"));
+			int resolution = sequence.getResolution();
+			int cutOffset = (int)(resolution/8*TEMPO);
+			Track[] tracks = sequence.getTracks();
+			System.out.println("Tracks: " + tracks.length);
+			Track firstTrack = tracks[1];
 			long tickLength = sequence.getTickLength();
-
 			int totalWidth = (int) (tickLength * TEMPO);
-			int staves = (totalWidth / STAVE_WIDTH) + 1;
-			BufferedImage image = new BufferedImage(STAVE_WIDTH, STAVE_HEIGHT
-					* staves, BufferedImage.TYPE_BYTE_GRAY);
-			Graphics2D g = (Graphics2D) image.getGraphics();
-			// Draw background
-			g.setColor(Color.WHITE);
-			g.fillRect(0, 0, STAVE_WIDTH, STAVE_HEIGHT * staves);
-			g.setColor(Color.BLACK);
-			for (int i = 0; i < staves; i++) {
-				// Draw cut marker
-				int offset = i * STAVE_HEIGHT;
-				g.setStroke(new BasicStroke(10));
-				g.drawLine(0, offset, STAVE_WIDTH, offset);
-
-				// Draw keys and stave
-				FontRenderContext frc = g.getFontRenderContext();
-				Font f = new Font("Helvetica", Font.PLAIN, 96);
-				float[] dashPattern = { 150, 10 };
-				g.setStroke(new BasicStroke(1, BasicStroke.CAP_BUTT,
-						BasicStroke.JOIN_MITER, 10, dashPattern, 0));
-				for (int j = 0; j < keyMap.length; j++) {
-					g.drawLine(PADDING_LEFT / 2, offset + j * KEY_DISTANCE
-							+ PADDING_TOP, STAVE_WIDTH - PADDING_RIGHT / 2,
-							offset + j * KEY_DISTANCE + PADDING_TOP);
-					TextLayout tl = new TextLayout(notes[j % notes.length], f,
-							frc);
-					tl.draw(g, KEY_DISTANCE, offset + (keyMap.length - 1 - j)
-							* KEY_DISTANCE + TEXT_PADDING_TOP);
+			int numberOfStaves = (int) Math.ceil(totalWidth
+					/ (float) (STAVE_WIDTH - PADDING_LEFT - PADDING_RIGHT));
+			int numberOfPages = (int) Math.ceil(numberOfStaves
+					/ (float) STAVES_PER_PAGE);
+			BufferedImage pages[] = new BufferedImage[numberOfPages];
+			for (int page = 0; page < numberOfPages; page++) {
+				int staves = STAVES_PER_PAGE;
+				if (page == numberOfPages - 1) {
+					staves = numberOfStaves % STAVES_PER_PAGE;
+					if (staves == 0) {
+						staves = STAVES_PER_PAGE;
+					}
 				}
+				pages[page] = new BufferedImage(STAVE_WIDTH, STAVE_HEIGHT
+						* staves, BufferedImage.TYPE_BYTE_GRAY);
+				Graphics2D g = (Graphics2D) pages[page].getGraphics();
+				// Draw background
+				g.setColor(Color.WHITE);
+				g.fillRect(0, 0, STAVE_WIDTH, STAVE_HEIGHT * staves);
+				g.setColor(Color.BLACK);
+				for (int stave = 0; stave < staves; stave++) {
+					// Draw cut marker
+					int offset = stave * STAVE_HEIGHT;
+					g.setStroke(new BasicStroke(10));
+					g.drawLine(0, offset, STAVE_WIDTH, offset);
+
+					// Draw stave
+					FontRenderContext frc = g.getFontRenderContext();
+					Font f = new Font("Helvetica", Font.PLAIN, 96);
+					float[] dashPattern = { 150, 10 };
+					g.setStroke(new BasicStroke(1, BasicStroke.CAP_BUTT,
+							BasicStroke.JOIN_MITER, 10, dashPattern, 0));
+					for (int key = 0; key < keyMap.length; key++) {
+						g.drawLine(PADDING_LEFT / 2, offset + key
+								* KEY_DISTANCE + PADDING_TOP, STAVE_WIDTH
+								- PADDING_RIGHT / 2, offset + key
+								* KEY_DISTANCE + PADDING_TOP);
+						if (stave == 0) {
+							// Draw keys
+							TextLayout tl = new TextLayout(notes[key
+									% notes.length], f, frc);
+							tl.draw(g, KEY_DISTANCE, offset
+									+ (keyMap.length - 1 - key) * KEY_DISTANCE
+									+ TEXT_PADDING_TOP);
+						} else {
+							// Draw cut marker
+							g.drawLine(PADDING_LEFT-cutOffset, offset, PADDING_LEFT-cutOffset, offset+STAVE_HEIGHT);
+						}
+						g.drawLine(STAVE_WIDTH-PADDING_RIGHT+cutOffset, offset, STAVE_WIDTH-PADDING_RIGHT+cutOffset, offset+STAVE_HEIGHT);
+					}
+				}
+				g.setStroke(new BasicStroke(10));
+				g.drawLine(0, numberOfStaves * STAVE_HEIGHT, STAVE_WIDTH,
+						numberOfStaves * STAVE_HEIGHT);
 			}
-			g.setStroke(new BasicStroke(10));
-			g.drawLine(0, staves * STAVE_HEIGHT, STAVE_WIDTH, staves
-					* STAVE_HEIGHT);
 			// Draw track
 			float staveWidth = STAVE_WIDTH - PADDING_LEFT - PADDING_RIGHT;
-			Track[] tracks = sequence.getTracks();
-			System.out.print("Tracks: " + tracks.length);
-			Track firstTrack = tracks[1];
 			for (int i = 0; i < firstTrack.size(); i++) {
 				MidiEvent midiEvent = firstTrack.get(i);
 				MidiMessage message = midiEvent.getMessage();
@@ -88,10 +113,16 @@ public class Spieluhr {
 						int key = getKey(shortMessage.getData1());
 						if (key >= 0) {
 							long tick = midiEvent.getTick();
-							System.out.println("Note:"
-									+ notes[key % notes.length] + "(" + key / 8
-									+ ") - " + tick);
 							int stave = (int) (tick * TEMPO / staveWidth);
+							int page = stave / STAVES_PER_PAGE;
+							stave -= page * STAVES_PER_PAGE;
+							System.out.println("Printin note="
+									+ notes[key % notes.length] + "(" + key / 8
+									+ ") - on page=" + page + ", stave="
+									+ stave + ", tick=" + tick);
+							Graphics2D g = (Graphics2D) pages[page]
+									.getGraphics();
+							g.setColor(Color.BLACK);
 							g.fill(new Ellipse2D.Double(tick * TEMPO
 									% staveWidth + PADDING_LEFT, stave
 									* STAVE_HEIGHT + key * KEY_DISTANCE
@@ -101,8 +132,11 @@ public class Spieluhr {
 					}
 				}
 			}
-			File outputfile = new File("C:/tmp/Spieluhr2.png");
-			ImageIO.write(image, "png", outputfile);
+			for (int page = 0; page < numberOfPages; page++) {
+				File outputfile = new File("C:/tmp/" + NAME + "-Page" + page
+						+ ".png");
+				ImageIO.write(pages[page], "png", outputfile);
+			}
 		} catch (InvalidMidiDataException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
