@@ -24,7 +24,7 @@ public class Spieluhr {
 	private final static String NAME = "Spieluhr3";
 	private final static String[] notes = new String[] { "C", "D", "E", "F",
 			"G", "A", "B" };
-	private static final float TEMPO = 0.9F; // TEMPO
+	private static final float TEMPO = 0.945F; // TEMPO
 
 	private static final int PADDING_TOP = 250, PADDING_LEFT = 500,
 			PADDING_RIGHT = 500, TEXT_PADDING_TOP = 285;
