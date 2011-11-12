@@ -41,7 +41,7 @@ public class Spieluhr {
 			Sequence sequence = MidiSystem.getSequence(new File("C:/tmp/"
 					+ NAME + ".mid"));
 			int resolution = sequence.getResolution();
-			int cutOffset = (int)(resolution/8*TEMPO);
+			int cutOffset = (int) (resolution / 8 * TEMPO);
 			Track[] tracks = sequence.getTracks();
 			System.out.println("Tracks: " + tracks.length);
 			Track firstTrack = tracks[1];
@@ -76,6 +76,18 @@ public class Spieluhr {
 					// Draw stave
 					FontRenderContext frc = g.getFontRenderContext();
 					Font f = new Font("Helvetica", Font.PLAIN, 96);
+					if (stave > 0 || page > 0) {
+						TextLayout tl = new TextLayout(String.valueOf(stave+page*STAVES_PER_PAGE),
+								f, frc);
+						tl.draw(g, KEY_DISTANCE, offset
+								+ (keyMap.length / 2) * KEY_DISTANCE
+								+ TEXT_PADDING_TOP);
+						g.setStroke(new BasicStroke(5));
+						g.draw(new Ellipse2D.Double(KEY_DISTANCE-50, offset
+								+ (keyMap.length / 2) * KEY_DISTANCE
+								+ TEXT_PADDING_TOP - 110,
+								150, 150));
+					}
 					float[] dashPattern = { 150, 10 };
 					g.setStroke(new BasicStroke(1, BasicStroke.CAP_BUTT,
 							BasicStroke.JOIN_MITER, 10, dashPattern, 0));
@@ -84,7 +96,7 @@ public class Spieluhr {
 								* KEY_DISTANCE + PADDING_TOP, STAVE_WIDTH
 								- PADDING_RIGHT / 2, offset + key
 								* KEY_DISTANCE + PADDING_TOP);
-						if (stave == 0) {
+						if (stave == 0 && page == 0) {
 							// Draw keys
 							TextLayout tl = new TextLayout(notes[key
 									% notes.length], f, frc);
@@ -93,9 +105,14 @@ public class Spieluhr {
 									+ TEXT_PADDING_TOP);
 						} else {
 							// Draw cut marker
-							g.drawLine(PADDING_LEFT-cutOffset, offset, PADDING_LEFT-cutOffset, offset+STAVE_HEIGHT);
+							g.drawLine(PADDING_LEFT - cutOffset, offset,
+									PADDING_LEFT - cutOffset, offset
+											+ STAVE_HEIGHT);
 						}
-						g.drawLine(STAVE_WIDTH-PADDING_RIGHT+cutOffset, offset, STAVE_WIDTH-PADDING_RIGHT+cutOffset, offset+STAVE_HEIGHT);
+						g.drawLine(STAVE_WIDTH - PADDING_RIGHT + cutOffset,
+								offset,
+								STAVE_WIDTH - PADDING_RIGHT + cutOffset, offset
+										+ STAVE_HEIGHT);
 					}
 				}
 				g.setStroke(new BasicStroke(10));
