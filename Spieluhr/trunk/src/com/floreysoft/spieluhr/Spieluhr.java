@@ -21,10 +21,10 @@ import javax.sound.midi.ShortMessage;
 import javax.sound.midi.Track;
 
 public class Spieluhr {
-	private final static String NAME = "Spieluhr3";
+	private final static String NAME = "Spieluhr4";
 	private final static String[] notes = new String[] { "C", "D", "E", "F",
 			"G", "A", "B" };
-	private static final float TEMPO = 0.945F; // TEMPO
+	private static final float TEMPO = 0.892F; // TEMPO
 
 	private static final int PADDING_TOP = 250, PADDING_LEFT = 500,
 			PADDING_RIGHT = 500, TEXT_PADDING_TOP = 285;
