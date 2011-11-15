@@ -29,7 +29,7 @@ public class Spieluhr {
 	private static final int PADDING_TOP = 250, PADDING_LEFT = 500,
 			PADDING_RIGHT = 500, TEXT_PADDING_TOP = 285;
 
-	private static final int STAVE_HEIGHT = 2500, STAVE_WIDTH = 8000,
+	private static final int STAVE_HEIGHT = 2500, STAVE_WIDTH = 10000,
 			KEY_DISTANCE = 105, HOLE_WIDTH = 50, HOLE_HEIGHT = 50,
 			STAVES_PER_PAGE = 3;
 
