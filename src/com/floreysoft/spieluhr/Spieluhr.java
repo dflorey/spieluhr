@@ -26,12 +26,12 @@ public class Spieluhr {
 			"G", "A", "B" };
 	private static final float TEMPO = 0.892F; // TEMPO
 
-	private static final int PADDING_TOP = 250, PADDING_LEFT = 500,
-			PADDING_RIGHT = 500, TEXT_PADDING_TOP = 285;
+	private static final int PADDING_TOP = 200, PADDING_LEFT = 500,
+			PADDING_RIGHT = 500, TEXT_PADDING_TOP = 235;
 
 	private static final int STAVE_HEIGHT = 2500, STAVE_WIDTH = 10000,
-			KEY_DISTANCE = 105, HOLE_WIDTH = 50, HOLE_HEIGHT = 50,
-			STAVES_PER_PAGE = 3;
+			KEY_DISTANCE = 110, HOLE_WIDTH = 50, HOLE_HEIGHT = 50,
+			STAVES_PER_PAGE = 3, CUT_OFFSET = 100;
 
 	private static final int[] keyMap = new int[] { 81, 79, 77, 76, 74, 72, 71,
 			69, 67, 65, 64, 62, 60, 59, 57, 55, 53, 52, 50, 48 };
@@ -40,8 +40,6 @@ public class Spieluhr {
 		try {
 			Sequence sequence = MidiSystem.getSequence(new File("C:/tmp/"
 					+ NAME + ".mid"));
-			int resolution = sequence.getResolution();
-			int cutOffset = (int) (resolution / 8 * TEMPO);
 			Track[] tracks = sequence.getTracks();
 			System.out.println("Tracks: " + tracks.length);
 			Track firstTrack = tracks[1];
@@ -105,13 +103,13 @@ public class Spieluhr {
 									+ TEXT_PADDING_TOP);
 						} else {
 							// Draw cut marker
-							g.drawLine(PADDING_LEFT - cutOffset, offset,
-									PADDING_LEFT - cutOffset, offset
+							g.drawLine(PADDING_LEFT + CUT_OFFSET, offset,
+									PADDING_LEFT + CUT_OFFSET, offset
 											+ STAVE_HEIGHT);
 						}
-						g.drawLine(STAVE_WIDTH - PADDING_RIGHT + cutOffset,
+						g.drawLine(STAVE_WIDTH - PADDING_RIGHT + CUT_OFFSET,
 								offset,
-								STAVE_WIDTH - PADDING_RIGHT + cutOffset, offset
+								STAVE_WIDTH - PADDING_RIGHT + CUT_OFFSET, offset
 										+ STAVE_HEIGHT);
 					}
 				}
