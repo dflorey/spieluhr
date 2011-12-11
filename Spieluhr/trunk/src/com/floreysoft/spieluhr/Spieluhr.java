@@ -26,11 +26,11 @@ public class Spieluhr {
 			"G", "A", "B" };
 	private static final float TEMPO = 0.892F; // TEMPO
 
-	private static final int PADDING_TOP = 200, PADDING_LEFT = 500,
-			PADDING_RIGHT = 500, TEXT_PADDING_TOP = 235;
+	private static final int PADDING_TOP = 220, PADDING_LEFT = 500,
+			PADDING_RIGHT = 500, TEXT_PADDING_TOP = 250;
 
 	private static final int STAVE_HEIGHT = 2500, STAVE_WIDTH = 10000,
-			KEY_DISTANCE = 110, HOLE_WIDTH = 50, HOLE_HEIGHT = 50,
+			KEY_DISTANCE = 108, HOLE_WIDTH = 50, HOLE_HEIGHT = 50,
 			STAVES_PER_PAGE = 3, CUT_OFFSET = 100;
 
 	private static final int[] keyMap = new int[] { 81, 79, 77, 76, 74, 72, 71,
