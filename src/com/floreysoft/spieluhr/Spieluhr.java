@@ -10,6 +10,7 @@ import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
 import javax.imageio.ImageIO;
 import javax.sound.midi.InvalidMidiDataException;
@@ -22,24 +23,26 @@ import javax.sound.midi.Track;
 
 public class Spieluhr {
 	private final static String NAME = "Spieluhr4";
-	private final static String[] notes = new String[] { "C", "D", "E", "F",
-			"G", "A", "B" };
+	private final static String[] notes = new String[] { "F", "G", "C", "D", "E", "F",
+			"G", "A", "B", "H", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "B", "H", "C", "C#", "D", "D#",
+			"E", "F", "G", "A" };
 	private static final float TEMPO = 0.892F; // TEMPO
 
 	private static final int PADDING_TOP = 220, PADDING_LEFT = 500,
 			PADDING_RIGHT = 500, TEXT_PADDING_TOP = 250;
 
 	private static final int STAVE_HEIGHT = 2500, STAVE_WIDTH = 10000,
-			KEY_DISTANCE = 108, HOLE_WIDTH = 50, HOLE_HEIGHT = 50,
+			KEY_DISTANCE = 70, HOLE_WIDTH = 50, HOLE_HEIGHT = 50,
 			STAVES_PER_PAGE = 3, CUT_OFFSET = 100;
 
-	private static final int[] keyMap = new int[] { 81, 79, 77, 76, 74, 72, 71,
-			69, 67, 65, 64, 62, 60, 59, 57, 55, 53, 52, 50, 48 };
+	private static final int[] keyMap = new int[] { 93, 91, 89, 88, 87, 86, 85, 84, 83, 82, 81, 80, 79, 78, 77, 76, 75,
+			74, 73, 72, 71, 70, 69, 67, 65, 64, 62, 60, 55, 53 };
 
 	public static void main(String[] args) {
 		try {
-			Sequence sequence = MidiSystem.getSequence(new File("C:/tmp/"
-					+ NAME + ".mid"));
+			ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+			InputStream is = classloader.getResourceAsStream("SpieluhrAll.midi");
+			Sequence sequence = MidiSystem.getSequence(is);
 			Track[] tracks = sequence.getTracks();
 			System.out.println("Tracks: " + tracks.length);
 			Track firstTrack = tracks[1];
@@ -75,13 +78,13 @@ public class Spieluhr {
 					FontRenderContext frc = g.getFontRenderContext();
 					Font f = new Font("Helvetica", Font.PLAIN, 96);
 					if (stave > 0 || page > 0) {
-						TextLayout tl = new TextLayout(String.valueOf(stave+page*STAVES_PER_PAGE),
+						TextLayout tl = new TextLayout(String.valueOf(stave + page * STAVES_PER_PAGE),
 								f, frc);
 						tl.draw(g, KEY_DISTANCE, offset
 								+ (keyMap.length / 2) * KEY_DISTANCE
 								+ TEXT_PADDING_TOP);
 						g.setStroke(new BasicStroke(5));
-						g.draw(new Ellipse2D.Double(KEY_DISTANCE-50, offset
+						g.draw(new Ellipse2D.Double(KEY_DISTANCE - 50, offset
 								+ (keyMap.length / 2) * KEY_DISTANCE
 								+ TEXT_PADDING_TOP - 110,
 								150, 150));
@@ -92,8 +95,9 @@ public class Spieluhr {
 					for (int key = 0; key < keyMap.length; key++) {
 						g.drawLine(PADDING_LEFT / 2, offset + key
 								* KEY_DISTANCE + PADDING_TOP, STAVE_WIDTH
-								- PADDING_RIGHT / 2, offset + key
-								* KEY_DISTANCE + PADDING_TOP);
+										- PADDING_RIGHT / 2,
+								offset + key
+										* KEY_DISTANCE + PADDING_TOP);
 						if (stave == 0 && page == 0) {
 							// Draw keys
 							TextLayout tl = new TextLayout(notes[key
@@ -131,7 +135,7 @@ public class Spieluhr {
 							int stave = (int) (tick * TEMPO / staveWidth);
 							int page = stave / STAVES_PER_PAGE;
 							stave -= page * STAVES_PER_PAGE;
-							System.out.println("Printin note="
+							System.out.println("Printin data="+shortMessage.getData1()+", note="
 									+ notes[key % notes.length] + "(" + key / 8
 									+ ") - on page=" + page + ", stave="
 									+ stave + ", tick=" + tick);
@@ -139,16 +143,17 @@ public class Spieluhr {
 									.getGraphics();
 							g.setColor(Color.BLACK);
 							g.fill(new Ellipse2D.Double(tick * TEMPO
-									% staveWidth + PADDING_LEFT, stave
-									* STAVE_HEIGHT + key * KEY_DISTANCE
-									+ PADDING_TOP - HOLE_HEIGHT / 2,
+									% staveWidth + PADDING_LEFT,
+									stave
+											* STAVE_HEIGHT + key * KEY_DISTANCE
+											+ PADDING_TOP - HOLE_HEIGHT / 2,
 									HOLE_WIDTH, HOLE_HEIGHT));
 						}
 					}
 				}
 			}
 			for (int page = 0; page < numberOfPages; page++) {
-				File outputfile = new File("C:/tmp/" + NAME + "-Page" + page
+				File outputfile = new File("/Users/dflorey/develop/spieluhr/out/" + NAME + "-Page" + page
 						+ ".png");
 				ImageIO.write(pages[page], "png", outputfile);
 			}
